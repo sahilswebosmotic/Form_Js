@@ -14,10 +14,14 @@ class Main {
     // console.log(formData, frm, storage, tbl, 'Printed all instance of the class to remove eslint error');
     // this.communication();
     window.addEventListener('form:submit', function (e) {
-      storage.add(e.detail);
-      console.log('record stored')
-      console.log(storage.employees);
-      tbl.render_Basic_Employee_Table(storage.employees);
+      // storage.add(e.detail);
+
+      const storeEvent = new CustomEvent('storeData', { detail: e.detail });
+      window.dispatchEvent(storeEvent);
+
+      // console.log('record stored')
+      // console.log(storage.employees);
+      // tbl.render_Basic_Employee_Table(storage.employees);
     });
     window.addEventListener('form:reset', function (e) {
       console.log('form reset');
