@@ -1,83 +1,263 @@
 export default class Form {
   constructor(formContainerId, formData) {
-    this.container = document.getElementById(formContainerId); //Container element from HTML in which you have to add form
+    this.container = document.getElementById(formContainerId);
+    //Container element from HTML in which you have to add form
     // Pass formContainerId to append form element inside of HTML DIV element
     // use formData to create form
     this.formData = formData;
-    this.formE1 = null;
-    this.formState ={};
+    // form element for storing the form in the formContainerid
+    // this.formEl = document.getElementById(formContainerId) ;
+    // form state
+    this.formState = {};
+    // hidden type fields
     this.hiddenFields = [];
-    this.fields= [];
+    // fields which are not hidden
+    this.fields = [];
 
     this.initialize();
-    console.log('Form', formData);
+    // console.log('Form', formData);
   }
   // create methods/event to create form/ reset form/ submit form, etc
 
   // initalize the form part
-  initialize(){
+  initialize() {
     this.validateInputs();
     this.saperateFormField();
-    this.createForm();
     this.loopingFields();
-    this.bindFormSubmit();
-  } 
-    // validation for the form data and the container in which we add the html form
-    validateInputs() {
+    this.getFormDataObject();
+    this.FormSubmit();
+    this.FormReset();
+  }
+  // validation for the form data and the container in which we add the html form
+  validateInputs() {
     if (!this.container) {
-      throw new Error('Form: container element not found');
+      console.log('Form: container element not found');
     }
 
     if (!Array.isArray(this.formData)) {
-      throw new Error('Form: formData must be an array');
+      console.log('Form: formData must be an array');
     }
   }
-  // saperate the hidden input form field
-    saperateFormField() {
-    this.formData.forEach(field => {
-      if (field.type === 'hidden') {
-        this.hiddenFields.push(field);
+
+  saperateFormField() {
+    this.formData.forEach((ele) => {
+      if (ele.type === 'hidden') {
+        this.hiddenFields.push(ele);
       } else {
-        this.fields.push(field);
+        this.fields.push(ele);
       }
     });
   }
 
-  // create the form element based on the formdata
-  createForm() {
-    this.formEl = document.createElement('form');
-    this.formEl.noValidate = false;
-    this.container.appendChild(this.formEl);
-  }
-
-  // loop through each field so that add the formdata field into the form element which is created
   loopingFields() {
-    this.fields.forEach(field => {
-      const el = this.loopField(field);
-      if (el) this.formEl.appendChild(el);
+    this.fields.forEach((field) => {
+      this.loopField(field);
     });
   }
 
-  // loop by each input field and adding values saperately
-  loopField(field){
+  loopField(field) {
     let ele;
-    switch(field.type){
-      case text:
-      case email:
-      case number:
-      case tel:
-         ele = document.createElement('input');
+    switch (field.type) {
+      case 'text':
+        ele = document.createElement('input');
         ele.type = field.type;
+        ele.name = field.key;
+        this.initState(field, field.value || '');
+
+        break;
+
+      case 'email':
+        ele = document.createElement('input');
+        ele.type = field.type;
+        ele.name = field.key;
         this.initState(field, field.value || '');
         break;
+
+      case 'number':
+        ele = document.createElement('input');
+        ele.type = field.type;
+        ele.name = field.key;
+        this.initState(field, field.value || '');
+        break;
+
+      case 'tel':
+        ele = document.createElement('input');
+        ele.type = field.type;
+        ele.name = field.key;
+        this.initState(field, field.value || '');
+        break;
+
+      case 'textarea':
+        ele = document.createElement('textarea');
+        ele.name = field.key;
+        this.initState(field, field.value || '');
+        break;
+
+      case 'select':
+        ele = document.createElement('select');
+        field.options.forEach((opt) => {
+          const option = document.createElement('option');
+          option.innerText = opt.innerText;
+          option.value = opt.value;
+          ele.appendChild(option);
+        });
+        this.initState(field, field.value || '');
+        break;
+
+  
+
+      case 'checkbox':
+        ele = document.createElement('div');
+
+        const key = field.key;
+        this.formState[key] = field.value||[];
+
+        field.options.forEach((opt) => {
+          const input = document.createElement('input');
+          input.type = 'checkbox';
+          input.name = key;
+          input.value = opt.value;
+          input.id = opt.attr.id;
+          input.className = opt.attr.className;
+
+          input.addEventListener('change', (e) => {
+            const arr = field.value || [];
+            if (e.target.checked) {
+              arr.push(opt.value);
+            } else {
+              field.value = arr.filter((v) => v !== opt.value);
+            }
+            this.formState[key] = arr;
+          });
+
+          ele.appendChild(input);
+          ele.appendChild(document.createTextNode(opt.innerText));
+        });
+        break;
+
+      case 'radio':
+        ele = document.createElement('div');
+        this.formState[field.key] = field.value || '';
+        field.options.forEach((opt) => {
+          const input = document.createElement('input');
+          input.type = 'radio';
+          input.value = opt.value;
+          input.name = opt.name;
+          input.id = opt.attr.id;
+          input.className = opt.attr.className;
+          input.required = opt.attr.required;
+
+          input.addEventListener('change', (e) => {
+            this.formState[field.key] = e.target.value;
+            console.log(this.formState);
+          });
+
+          const label = document.createElement('label');
+          label.innerText = opt.innerText;
+          label.htmlFor = opt.value;
+          ele.appendChild(input);
+          ele.appendChild(label);
+        });
+        break;
+
+      case 'submit':
+      case 'reset':
+        ele = document.createElement('button');
+        ele.type = field.type;
+        ele.textContent = field.attr.value;
+        break;
+
+      default:
+        break;
+    }
+
+    if (field.attr) {
+      this.applyAttributes(ele, field.attr,field);
+    }
+    if (field) {
+      this.wrappDiv(ele, field);
+    }
+    this.getInput(ele, field);
+    return ele;
+  }
+
+  initState(field, initialValue) {
+    const k = field.key || field.name;
+    if (!k) return;
+
+    if (this.formState[k] === undefined) {
+      this.formState[k] = initialValue;
     }
   }
 
-// give the intialvalue if that is in existence
-    initState(field, initialValue) {
-    if (this.formState[field.name] === undefined) {
-      this.formState[field.name] = initialValue;
+  wrappDiv(ele, field) {
+    if (field.label === undefined) {
+      this.container.appendChild(ele);
+    } else {
+      const div = document.createElement('div');
+      const label = document.createElement('label');
+      label.innerText = field.label;
+      label.htmlFor = field.key;
+      div.appendChild(label);
+      div.appendChild(ele);
+      this.container.appendChild(div);
     }
   }
 
+  applyAttributes(ele, attr, field) {
+    if (!ele || !attr) {
+      return;
+    } else {
+      Object.entries(attr).forEach(([key, value]) => {
+        if (key.startsWith('onclick') && typeof value === 'function' && key.value === 'Submit') {
+          ele[key] = this.FormSubmit();
+        } else if (key.value === 'Reset' && key.startsWith('onclick') && typeof value === 'function') {
+          ele[key] = this.FormReset();
+        } else if (key.startsWith('onchange')) {
+          ele[key] = this.getInput(ele, field);
+        } else {
+          console.log(ele[key] = value);
+        }
+      });
+    }
+  }
+
+  getInput(ele, field) {
+    const k = field.key || field.name;
+    if (!k || !ele) return;
+    ele.addEventListener('input', (e) => {
+      this.formState[k] = e.target.value;
+      console.log(this.formState);
+    });
+  }
+
+  getFormDataObject() {
+    const data = this.formState;
+    this.hiddenFields.forEach((field) => {
+      if (typeof field.getValue === 'function') {
+        data[field.key] = field.getValue(data);
+      } else {
+        console.log("don't add any element ");
+      }
+    });
+    return data;
+  }
+
+  FormSubmit() {
+    this.container.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = this.getFormDataObject();
+      const submitEvent = new CustomEvent('form:submit', { detail: data, bubbles: true });
+      window.dispatchEvent(submitEvent);
+    });
+  }
+
+  FormReset() {
+    this.container.addEventListener('reset', (e) => {
+      this.formState = {};
+      const data = this.formState;
+      const resetEvent = new CustomEvent('form:reset', { detail: data });
+      window.dispatchEvent(resetEvent);
+    });
+  }
 }

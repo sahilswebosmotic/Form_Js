@@ -27,7 +27,7 @@ const formData = [
     key: 'name',
     value: '',
     // attr is option, User can add new html element properties to it or user can remove all properties like empty object  attr: {}
-    attr: {
+    attr: { 
       id: 'txtName1',
       className: 'form-control textInput',
       placeholder: 'Enter name',
