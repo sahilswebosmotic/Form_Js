@@ -235,11 +235,7 @@ const formData = [
       className: 'btn btn-block btn-primary submit',
       value: 'Submit',
       onclick: function () {
-        // e, obj, array, dataObjArray you will get in function argument
-        // e:  its button native event
-        // obj: current form data in object form
-        // array: formData array
-        // dataObjArray: localstorage all data from storage.js
+
       },
     },
   },

@@ -1,13 +1,11 @@
 export default class Table {
   constructor(tableContainerId) {
-    this.container = document.getElementById(tableContainerId); // Use this container to create table inside of it
-    // Pass tableContainerId to append table inside of HTML DIV element
+    this.container = document.getElementById(tableContainerId);
     document.addEventListener('table:render', (e) => {     
       this.render_Basic_Employee_Table(e.detail);
     })  
-
   }
-  // create methods/event to refresh table data,add data row, update data row, delete data row, etc
+
   render_Basic_Employee_Table(data) {
     const container = this.container;
     const tableSection = document.querySelector('.tableSection');
@@ -20,7 +18,6 @@ export default class Table {
 
     // Check if data exists and has at least 1 record
     if(!data || !Array.isArray(data) || data.length === 0) {
-      // Hide table section when no records found
       if(tableSection) {
         tableSection.style.display = 'none';
       }
@@ -33,7 +30,6 @@ export default class Table {
     }
     
     const table = document.createElement('table');
-
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
 
@@ -45,7 +41,6 @@ export default class Table {
       headerRow.appendChild(th);
     });
 
-    // Add Action header at the end
     const thaction = document.createElement('th');
     thaction.innerText = 'Action';
     thaction.classList.add('basic-view-action');
@@ -56,9 +51,18 @@ export default class Table {
 
     const tbody = document.createElement('tbody');
 
-    data.forEach((emp,id) => {
+    data.forEach((emp, id) => {
       const row = document.createElement('tr');
-
+      
+      // Handle hobbies properly
+      let hobbiesText = '';
+      if (Array.isArray(emp.hobbies) && emp.hobbies.length > 0) {
+        hobbiesText = emp.hobbies.join(', ');
+      } else if (typeof emp.hobbies === 'string' && emp.hobbies.trim()) {
+        hobbiesText = emp.hobbies;
+      } else {
+        hobbiesText = ' - ';
+      }
       [
         emp.name,
         emp.email,
@@ -70,33 +74,34 @@ export default class Table {
         emp.pin_code,
         emp.country,
         emp.gender,
-        Array.isArray(emp.hobbies) ? emp.hobbies.join(', ') : (emp.hobbies || ''),
-        // hobbiesText
+        hobbiesText,
       ].forEach((value) => {
         const td = document.createElement('td');
-        td.innerText = value;
-        if(!value){
-          td.innerText = ' - ';
-        }
+        td.innerText = value || ' - ';
         row.appendChild(td);
       });
+
       const td = document.createElement('td');
 
       const del_btn = document.createElement('button');
       del_btn.textContent = 'DELETE';
+      del_btn.classList.add('delete-btn');
 
-      del_btn.addEventListener('click',(e)=>{
+      del_btn.addEventListener('click', (e) => {
         const id = emp.id;
-        const delete_record = new CustomEvent('delete_record',{detail:id});
+        const delete_record = new CustomEvent('delete_record', {detail: id});
         document.dispatchEvent(delete_record);
-      })
+      });
       
       const up_btn = document.createElement('button');
       up_btn.textContent = 'UPDATE';
-      up_btn.addEventListener('click',(e)=>{
-        const update_record = new CustomEvent('update_record',{detail:emp});
+      up_btn.classList.add('update-btn');
+
+      up_btn.addEventListener('click', (e) => {
+        const update_record = new CustomEvent('update_record', {detail: emp});
         document.dispatchEvent(update_record);
-      })
+      });
+
       td.appendChild(del_btn);
       td.appendChild(up_btn);
       row.appendChild(td);

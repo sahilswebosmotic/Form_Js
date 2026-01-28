@@ -14,7 +14,14 @@ export default class Form {
     // fields which are not hidden
     this.fields = [];
 
+    document.addEventListener('updateData', (e) => {
+      this.formState = { ...e.detail };
+      this.editingId = e.detail.id;  
+      this.updateForm();
+    });
+
     this.initialize();
+    // this.updateForm();
     // console.log('Form', formData);
   }
   // create methods/event to create form/ reset form/ submit form, etc
@@ -52,6 +59,7 @@ export default class Form {
   loopingFields() {
     this.fields.forEach((field) => {
       this.loopField(field);
+      // this.container.appendChild(el);
     });
   }
 
@@ -95,6 +103,7 @@ export default class Form {
 
       case 'select':
         ele = document.createElement('select');
+        ele.name = field.key;
         field.options.forEach((opt) => {
           const option = document.createElement('option');
           option.innerText = opt.innerText;
@@ -104,13 +113,13 @@ export default class Form {
         this.initState(field, field.value || '');
         break;
 
-  
-
       case 'checkbox':
         ele = document.createElement('div');
+        ele.classList.add('checkbox_place');
 
         const key = field.key;
-        this.formState[key] = field.value||[];
+        // this.formState[key] = field.value || [];
+        this.formState[key] = Array.isArray(field.value) ? [...field.value] : [];
 
         field.options.forEach((opt) => {
           const input = document.createElement('input');
@@ -120,12 +129,21 @@ export default class Form {
           input.id = opt.attr.id;
           input.className = opt.attr.className;
 
+          if (Array.isArray(this.formState[key]) && this.formState[key].includes(opt.value)) {
+            input.checked = true;
+          }
+
           input.addEventListener('change', (e) => {
             const arr = field.value || [];
+            // const arr = [...this.formState[key]];
             if (e.target.checked) {
               arr.push(opt.value);
             } else {
-              field.value = arr.filter((v) => v !== opt.value);
+              // field.value = arr.filter((v) => v !== opt.value);
+              const index = arr.indexOf(opt.value);
+              if (index > -1) {
+                arr.splice(index, 1);
+              }
             }
             this.formState[key] = arr;
           });
@@ -137,6 +155,7 @@ export default class Form {
 
       case 'radio':
         ele = document.createElement('div');
+        ele.classList.add('radio_place');
         this.formState[field.key] = field.value || '';
         field.options.forEach((opt) => {
           const input = document.createElement('input');
@@ -149,7 +168,7 @@ export default class Form {
 
           input.addEventListener('change', (e) => {
             this.formState[field.key] = e.target.value;
-            console.log(this.formState);
+            // console.log(this.formState);
           });
 
           const label = document.createElement('label');
@@ -172,7 +191,7 @@ export default class Form {
     }
 
     if (field.attr) {
-      this.applyAttributes(ele, field.attr,field);
+      this.applyAttributes(ele, field.attr, field);
     }
     if (field) {
       this.wrappDiv(ele, field);
@@ -197,7 +216,6 @@ export default class Form {
       const div = document.createElement('div');
       const label = document.createElement('label');
       label.innerText = field.label;
-      label.htmlFor = field.key;
       div.appendChild(label);
       div.appendChild(ele);
       this.container.appendChild(div);
@@ -216,7 +234,8 @@ export default class Form {
         } else if (key.startsWith('onchange')) {
           ele[key] = this.getInput(ele, field);
         } else {
-          console.log(ele[key] = value);
+          if (key === 'name') return;
+          ele[key] = value;
         }
       });
     }
@@ -227,7 +246,6 @@ export default class Form {
     if (!k || !ele) return;
     ele.addEventListener('input', (e) => {
       this.formState[k] = e.target.value;
-      console.log(this.formState);
     });
   }
 
@@ -243,12 +261,70 @@ export default class Form {
     return data;
   }
 
+  updateForm() {
+    this.fields.forEach((field) => {
+      const value = this.formState[field.key];
+      if (value === undefined) return;
+
+      const ele = this.container.querySelector(`[name="${field.key}"]`);
+      if (!ele) return;
+
+      switch (field.type) {
+        case 'text':
+        case 'email':
+        case 'number':
+        case 'tel':
+        case 'textarea':
+          ele.value = value;
+          break;
+
+        case 'select':
+          ele.value = value;
+          break;
+
+        case 'checkbox': {
+          const checkboxes = this.container.querySelectorAll(`input[name="${field.key}"]`);
+          checkboxes.forEach((cb) => {
+            const formValue = Array.isArray(value) ? value : [];
+            cb.checked = formValue.includes(cb.value);
+          });
+          break;
+        }
+
+        case 'radio': {
+          const radios = this.container.querySelectorAll(`input[name="${field.key}"]`);
+          radios.forEach((r) => {
+            r.checked = r.value === value;
+          });
+          break;
+        }
+      }
+    });
+  }
+
   FormSubmit() {
     this.container.addEventListener('submit', (e) => {
       e.preventDefault();
+
       const data = this.getFormDataObject();
-      const submitEvent = new CustomEvent('form:submit', { detail: data, bubbles: true });
-      window.dispatchEvent(submitEvent);
+
+      if (this.editingId) {
+        data.userId = this.editingId;
+        data.mode = 'update';
+      } else {
+        data.mode = 'create';
+      }
+
+      const submitEvent = new CustomEvent('form:submit', {
+        detail: data,
+        bubbles: true,
+      });
+
+      document.dispatchEvent(submitEvent);
+
+      this.container.reset();
+      this.formState = {};
+      this.editingId = null;
     });
   }
 
@@ -257,7 +333,7 @@ export default class Form {
       this.formState = {};
       const data = this.formState;
       const resetEvent = new CustomEvent('form:reset', { detail: data });
-      window.dispatchEvent(resetEvent);
+      document.dispatchEvent(resetEvent);
     });
   }
 }

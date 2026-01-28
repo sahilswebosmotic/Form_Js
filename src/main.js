@@ -12,24 +12,56 @@ class Main {
     const storage = new Storage(storageId); // storage class to access storage methods
     const tbl = new Table(tableContainerId); // table js class to create table and access its methods
     // console.log(formData, frm, storage, tbl, 'Printed all instance of the class to remove eslint error');
-    // this.communication();
-    window.addEventListener('form:submit', function (e) {
-      // storage.add(e.detail);
 
+    // Listen the event for form submission
+    document.addEventListener('form:submit', (e) => {
+      // now giving this event to the storage for the storing the data in the local storage
       const storeEvent = new CustomEvent('storeData', { detail: e.detail });
-      window.dispatchEvent(storeEvent);
-
-      // console.log('record stored')
-      // console.log(storage.employees);
-      // tbl.render_Basic_Employee_Table(storage.employees);
+      document.dispatchEvent(storeEvent);
     });
-    window.addEventListener('form:reset', function (e) {
+
+    document.addEventListener('SendData', (e) => {
+      const showData_Table = new CustomEvent('table:render', { detail: e.detail });
+      document.dispatchEvent(showData_Table);
+    });
+
+    // this is for showing all the records
+    if (storage.getAll().length > 0) {
+      const table_render = new CustomEvent('table:render', { detail: storage.getAll() });
+      document.dispatchEvent(table_render);
+    }
+
+    document.addEventListener('delete_record', (e) => {
+      const recordId = e.detail;
+      if (frm.editingId === recordId) {
+        frm.container.reset();
+        frm.formState = {};
+        frm.editingId = null;
+      }
+      
+      const delete_record = new CustomEvent('deleteData', { detail: recordId });
+      document.dispatchEvent(delete_record);
+    });
+
+    document.addEventListener('update_record', (e) => {
+      const emp = e.detail;
+      frm.editingId = emp.id;
+      const update_record = new CustomEvent('updateData', { detail: emp });
+      document.dispatchEvent(update_record);
+    });
+
+    document.addEventListener('form:reset', (e) => {
       console.log('form reset');
-      const data = e.detail;
-      console.log(data);
+    });
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === storageId) {
+        const updatedData = storage.loadFromStorage();
+        const syncEvent = new CustomEvent('table:render', { detail: updatedData });
+        document.dispatchEvent(syncEvent);
+      }
     });
   }
-
 }
 //formContainerId: HTML Div element id inside of which you want to create form4
 // formContainerId -> #employeeForm of current index.html
