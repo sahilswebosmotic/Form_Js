@@ -1,13 +1,12 @@
-/* ===== Reset ===== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Only COLORS as variables */
+
 :root {
-  --primary: #007bff;
+  --primary: #732cf8;
   --secondary: #6c757d;
   --success: #28a745;
   --danger: #dc3545;
@@ -20,22 +19,21 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background: #f4f4f4;
+  background: var(--bg-light);
   color: var(--text-dark);
   line-height: 1.6;
+  background: linear-gradient(to bottom right, rgb(101, 110, 218), white);
 }
 
-/* ===== Title ===== */
+
 .title {
   text-align: center;
   font-size: 2.2rem;
-  padding: 2rem 1rem;
-  color: var(--primary);
-  border-bottom: 0.2rem solid var(--primary);
-  margin-bottom: 1.5rem;
+  padding: 0rem 1rem;
+  color: var(--bg-primary);
 }
 
-/* ===== Layout ===== */
+
 section {
   padding: 1.5rem 1rem;
 }
@@ -49,7 +47,6 @@ section {
   box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.1);
 }
 
-/* ===== Form ===== */
 form {
   width: 100%;
 }
@@ -87,7 +84,6 @@ textarea {
   resize: vertical;
 }
 
-/* Checkbox & Radio */
 .radio_place,
 .checkbox_place {
   display: flex;
@@ -128,14 +124,15 @@ form button:hover {
   opacity: 0.9;
 }
 
-/* ===== Table Section ===== */
+
 .tableSection {
   background: white;
   margin: 2rem auto;
+  max-width: 80%;
   border-radius: 0.4rem;
   box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.1);
   overflow-x: auto;
-  display: none; /* Hidden by default until data arrives */
+  display: none;
 }
 
 table {
@@ -151,16 +148,14 @@ thead {
 
 thead th {
   padding: 0.9rem;
-  text-align: left;
+  text-align: center;
 }
 
 tbody tr {
   border-bottom: 0.1rem solid var(--border);
+  white-space: break-spaces;
 }
 
-tbody tr:nth-child(even) {
-  background: #fafafa;
-}
 
 tbody tr:hover {
   background: var(--bg-light);
@@ -194,7 +189,7 @@ table button:last-child {
   background: var(--warning);
 }
 
-/* ===== Responsive ===== */
+
 @media (max-width: 48rem) {
   .title {
     font-size: 1.6rem;

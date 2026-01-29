@@ -18,9 +18,7 @@ export default class Table {
       return;
     }
 
-    // Check if data exists and has at least 1 record
     if(!data || !Array.isArray(data) || data.length === 0) {
-      // Hide table section when no records found
       if(tableSection) {
         tableSection.style.display = 'none';
       }
@@ -71,7 +69,6 @@ export default class Table {
         emp.country,
         emp.gender,
         Array.isArray(emp.hobbies) ? emp.hobbies.join(', ') : (emp.hobbies || ''),
-        // hobbiesText
       ].forEach((value) => {
         const td = document.createElement('td');
         td.innerText = value;
@@ -89,6 +86,7 @@ export default class Table {
         const id = emp.id;
         const delete_record = new CustomEvent('delete_record',{detail:id});
         document.dispatchEvent(delete_record);
+        
       })
       
       const up_btn = document.createElement('button');
@@ -96,6 +94,7 @@ export default class Table {
       up_btn.addEventListener('click',(e)=>{
         const update_record = new CustomEvent('update_record',{detail:emp});
         document.dispatchEvent(update_record);
+        
       })
       td.appendChild(del_btn);
       td.appendChild(up_btn);

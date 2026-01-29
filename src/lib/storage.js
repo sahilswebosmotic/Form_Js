@@ -5,18 +5,20 @@ export default class Storage {
     // local storageId is important to retrieve old saved data
     this.employees = this.loadFromStorage();
 
-      document.addEventListener('storeData', (e) => {
-      const data = e.detail;
-        if(data.mode==='update'){
-          const findIndex = this.employees.findIndex((emp)=> emp.id === data.id);
-            this.employees[findIndex] = data;
-            this.saveToStorage();
-        }else{
-          this.add(e.detail);
-        }
-      const sendEvent = new CustomEvent('SendData', { detail: this.employees });
-      document.dispatchEvent(sendEvent);
-    });
+    document.addEventListener('storeData', (e) => {
+  const data = e.detail;
+
+  if (data.mode === 'update') {
+    const index = this.employees.findIndex((emp) => emp.id === data.id);
+    if (index > -1) this.employees[index] = data;
+    this.saveToStorage();
+  } else {
+    this.add(data);
+  }
+
+  document.dispatchEvent(new CustomEvent('SendData', { detail: this.employees }));
+});
+
 
 
     document.addEventListener('deleteData', (e) => {

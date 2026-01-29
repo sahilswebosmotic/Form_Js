@@ -76,3 +76,5 @@ class Main {
 // const main = new Main('formContainerId', 'storageId', 'tableContainerId');
 const main = new Main('employeeForm', 'employeeData', 'tableDiv');
 // console.log(main);
+
+
