@@ -237,6 +237,7 @@ export default class Form {
 
   FormReset() {
     this.container.addEventListener('reset', () => {
+      this.editingId = null;
       this.onReset();
     });
   }
