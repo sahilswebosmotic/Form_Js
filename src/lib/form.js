@@ -9,8 +9,6 @@ export default class Form {
     this.onSubmit = callbacks.onSubmit || (() => { });
     this.onReset = callbacks.onReset || (() => { });
     this.onUpdate = callbacks.onUpdate || (() => { });
-
-
     this.initialize();
   }
 
@@ -79,7 +77,6 @@ export default class Form {
           input.name = key;
           input.value = opt.value;
           this.applyAttributes(ele, field.attr);
-
           ele.appendChild(input);
           ele.appendChild(document.createTextNode(opt.innerText));
         });
@@ -94,7 +91,6 @@ export default class Form {
           input.name = key;
           input.value = opt.value;
           this.applyAttributes(ele, field.attr);
-
           ele.appendChild(input);
           ele.appendChild(document.createTextNode(opt.innerText));
         });
@@ -194,10 +190,8 @@ export default class Form {
       const key = field.key;
 
       if (field.type === 'checkbox') {
-
         data[key] = formData.getAll(key);
       } else if (field.type !== 'submit' && field.type !== 'reset') {
-
         data[key] = formData.get(key) || '';
       }
     });
@@ -217,23 +211,18 @@ export default class Form {
   FormSubmit() {
     this.container.addEventListener('submit', (e) => {
       e.preventDefault();
-
       const data = this.getFormDataObject();
-
       if (this.editingId) {
         data.id = this.editingId;
-        data.mode = 'update';
-      } else {
-        data.mode = 'create';
-      }
-
+      } 
       this.onSubmit(data);
-
       this.container.reset();
-
       this.editingId = null;
     });
   }
+
+
+  
 
   FormReset() {
     this.container.addEventListener('reset', () => {
@@ -254,8 +243,7 @@ export default class Form {
     const msgDiv = document.createElement('div');
     msgDiv.className = `form-message form-message-${type}`;
     msgDiv.textContent = message;
-
-    this.container.parentElement.insertBefore(msgDiv, this.container.nextSibling);
+    this.container.appendChild(msgDiv);
 
     setTimeout(() => {
       msgDiv.remove();
