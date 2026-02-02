@@ -1,20 +1,17 @@
 export default class Form {
-  constructor(formContainerId, formData) {
+  constructor(formContainerId, formData , callbacks={}) {
     this.container = document.getElementById(formContainerId);
     this.formData = formData;
-    this.formState = {};
     this.hiddenFields = [];
     this.fields = [];
     this.editingId = null;
 
-    document.addEventListener('updateData', (e) => {
-      this.formState = { ...e.detail };
-      this.editingId = e.detail.id;
-      this.updateForm();
-    });
+    this.onSubmit = callbacks.onSubmit || (() => { });
+    this.onReset = callbacks.onReset || (() => { });
+    this.onUpdate = callbacks.onUpdate || (() => { });
+
 
     this.initialize();
-    this.resetFormState();
   }
 
   initialize() {
@@ -50,17 +47,14 @@ export default class Form {
         ele = document.createElement('input');
         ele.type = field.type;
         ele.name = key;
-        ele.addEventListener('input', (e) => {
-          this.formState[key] = e.target.value;
-        });
+        this.applyAttributes(ele, field.attr);
         break;
 
       case 'textarea':
         ele = document.createElement('textarea');
         ele.name = key;
-        ele.addEventListener('input', (e) => {
-          this.formState[key] = e.target.value;
-        });
+
+        this.applyAttributes(ele, field.attr);
         break;
 
       case 'select':
@@ -72,9 +66,8 @@ export default class Form {
           option.innerText = opt.innerText;
           ele.appendChild(option);
         });
-        ele.addEventListener('change', (e) => {
-          this.formState[key] = e.target.value;
-        });
+
+        this.applyAttributes(ele, field.attr);
         break;
 
       case 'checkbox':
@@ -85,15 +78,7 @@ export default class Form {
           input.type = 'checkbox';
           input.name = key;
           input.value = opt.value;
-
-          input.addEventListener('change', (e) => {
-            const arr = this.formState[key] || (this.formState[key] = []);
-            if (e.target.checked) {
-              if (!arr.includes(opt.value)) arr.push(opt.value);
-            } else {
-              this.formState[key] = arr.filter((v) => v !== opt.value);
-            }
-          });
+          this.applyAttributes(ele, field.attr);
 
           ele.appendChild(input);
           ele.appendChild(document.createTextNode(opt.innerText));
@@ -108,10 +93,7 @@ export default class Form {
           input.type = 'radio';
           input.name = key;
           input.value = opt.value;
-
-          input.addEventListener('change', (e) => {
-            this.formState[key] = e.target.value;
-          });
+          this.applyAttributes(ele, field.attr);
 
           ele.appendChild(input);
           ele.appendChild(document.createTextNode(opt.innerText));
@@ -138,22 +120,10 @@ export default class Form {
     }
   }
 
-  resetFormState() {
-    this.formState = {};
-    this.fields.forEach((field) => {
-      const key = field.key;
-      if (field.type === 'checkbox'){
-        this.formState[key] = [];
-      }
-      else if (field.type !== 'submit' && field.type !== 'reset') {
-        this.formState[key] = '';
-      } 
-    });
-  }
 
-  updateForm() {
+  updateForm(data) {
     this.fields.forEach((field) => {
-      const value = this.formState[field.key];
+      const value = data[field.key];
       if (value === undefined) return;
 
       const ele = this.container.querySelector(`[name="${field.key}"]`);
@@ -195,15 +165,51 @@ export default class Form {
     });
   }
 
+
+
+  applyAttributes(element, attr) {
+    if (!attr) return;
+
+    Object.keys(attr).forEach((key) => {
+      const value = attr[key];
+
+      if (typeof value === 'function' || key === 'name') return;
+
+      if (key === 'className') {
+        element.className = value;
+      } else if (key === 'required' && value === true) {
+        element.setAttribute('required', '');
+      } else {
+        element.setAttribute(key, value);
+      }
+    });
+  }
+
   getFormDataObject() {
-    const data = this.formState;
+    const formData = new FormData(this.container);
+    const data = {};
+
+
+    this.fields.forEach((field) => {
+      const key = field.key;
+
+      if (field.type === 'checkbox') {
+
+        data[key] = formData.getAll(key);
+      } else if (field.type !== 'submit' && field.type !== 'reset') {
+
+        data[key] = formData.get(key) || '';
+      }
+    });
+
+
     this.hiddenFields.forEach((field) => {
       if (typeof field.getValue === 'function') {
         data[field.key] = field.getValue(data);
-      } else {
-        console.log("don't add any element ");
       }
     });
+
+    console.log(data);
     return data;
   }
 
@@ -221,18 +227,37 @@ export default class Form {
         data.mode = 'create';
       }
 
-      document.dispatchEvent(new CustomEvent('form:submit', { detail: data }));
+      this.onSubmit(data);
 
       this.container.reset();
-      this.resetFormState();
+
       this.editingId = null;
     });
   }
 
   FormReset() {
     this.container.addEventListener('reset', () => {
-      this.resetFormState();
-      document.dispatchEvent(new CustomEvent('form:reset'));
+      this.onReset();
     });
+  }
+
+  updateFormData(data) {
+    this.editingId = data.id;
+    this.updateForm(data);
+  }
+
+  showMessage(message, type = 'success') {
+    const existingMsg = this.container.parentElement.querySelector('.form-message');
+    if (existingMsg) existingMsg.remove();
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `form-message form-message-${type}`;
+    msgDiv.textContent = message;
+
+    this.container.parentElement.insertBefore(msgDiv, this.container.nextSibling);
+
+    setTimeout(() => {
+      msgDiv.remove();
+    }, 3000);
   }
 }

@@ -1,14 +1,12 @@
 export default class Table {
-  constructor(tableContainerId) {
-    this.container = document.getElementById(tableContainerId); // Use this container to create table inside of it
-    // Pass tableContainerId to append table inside of HTML DIV element
-    document.addEventListener('table:render', (e) => {     
-      this.render_Basic_Employee_Table(e.detail);
-    })  
+  constructor(tableContainerId,callbacks={}) {
+    this.container = document.getElementById(tableContainerId); 
 
+    this.onUpdate = callbacks.onUpdate || (()=>{});
+    this.onDelete = callbacks.onDelete || (()=>{});
   }
-  // create methods/event to refresh table data,add data row, update data row, delete data row, etc
-  render_Basic_Employee_Table(data) {
+
+  render(data) {
     const container = this.container;
     const tableSection = document.querySelector('.tableSection');
     container.innerHTML = '';
@@ -25,7 +23,6 @@ export default class Table {
       return;
     }
 
-    // Show table section when records exist
     if(tableSection) {
       tableSection.style.display = 'block';
     }
@@ -43,7 +40,6 @@ export default class Table {
       headerRow.appendChild(th);
     });
 
-    // Add Action header at the end
     const thaction = document.createElement('th');
     thaction.innerText = 'Action';
     thaction.classList.add('basic-view-action');
@@ -84,17 +80,17 @@ export default class Table {
 
       del_btn.addEventListener('click',(e)=>{
         const id = emp.id;
-        const delete_record = new CustomEvent('delete_record',{detail:id});
-        document.dispatchEvent(delete_record);
-        
+        this.onDelete(id);
       })
       
       const up_btn = document.createElement('button');
       up_btn.textContent = 'UPDATE';
       up_btn.addEventListener('click',(e)=>{
-        const update_record = new CustomEvent('update_record',{detail:emp});
-        document.dispatchEvent(update_record);
-        
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        })
+        this.onUpdate(emp); 
       })
       td.appendChild(del_btn);
       td.appendChild(up_btn);

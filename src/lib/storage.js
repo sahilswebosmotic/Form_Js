@@ -1,32 +1,9 @@
 export default class Storage {
-  constructor(storageId) {
-    this.storageId = storageId; // use this.storageId with localStorage as a unique key to store data
-    // Pass storageId to save json string data after each operation in localStorage
-    // local storageId is important to retrieve old saved data
+  constructor(storageId,callbacks={}) {
+    this.storageId = storageId; 
     this.employees = this.loadFromStorage();
+    this.onDataChange = callbacks.onDataChange || (() => { });
 
-    document.addEventListener('storeData', (e) => {
-  const data = e.detail;
-
-  if (data.mode === 'update') {
-    const index = this.employees.findIndex((emp) => emp.id === data.id);
-    if (index > -1) this.employees[index] = data;
-    this.saveToStorage();
-  } else {
-    this.add(data);
-  }
-
-  document.dispatchEvent(new CustomEvent('SendData', { detail: this.employees }));
-});
-
-
-
-    document.addEventListener('deleteData', (e) => {
-      this.delete(e.detail);
-
-      const sendEvent = new CustomEvent('SendData', { detail: this.employees });
-      document.dispatchEvent(sendEvent);
-    });
   }
 
   loadFromStorage() {
@@ -37,19 +14,30 @@ export default class Storage {
   saveToStorage() {
     localStorage.setItem(this.storageId, JSON.stringify(this.employees));
   }
-  // create methods to perform operations like save/edit/delete/add data
+
   getAll() {
     return [...this.employees];
   }
 
   add(record) {
-    record.id = Date.now(); // unique id
+    record.id = Date.now();
     this.employees.push(record);
     this.saveToStorage();
+    this.onDataChange(this.getAll());
   }
 
   delete(id) {
     this.employees = this.employees.filter((emp) => emp.id !== id);
     this.saveToStorage();
+    this.onDataChange(this.getAll());
+  }
+
+  update(record) {
+    const index = this.employees.findIndex((emp) => emp.id === record.id);
+    if (index > -1) {
+      this.employees[index] = record;
+      this.saveToStorage();
+      this.onDataChange(this.getAll());
+    }
   }
 }
