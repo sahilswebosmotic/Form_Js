@@ -16,7 +16,8 @@ export default class Storage {
   }
 
   getAll() {
-    return [...this.employees];
+    // return [...this.employees];
+    return this.employees;
   }
 
   add(record) {

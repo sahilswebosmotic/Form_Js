@@ -4,17 +4,17 @@ export default class Form {
     this.formData = formData;
     this.hiddenFields = [];
     this.fields = [];
+
     this.editingId = null;
 
     this.onSubmit = callbacks.onSubmit || (() => { });
     this.onReset = callbacks.onReset || (() => { });
-    this.onUpdate = callbacks.onUpdate || (() => { });
     this.initialize();
   }
 
   initialize() {
     this.validateInputs();
-    this.saperateFormField();
+    this.separateFormField();
     this.loopingFields();
     this.FormSubmit();
     this.FormReset();
@@ -25,7 +25,7 @@ export default class Form {
     if (!Array.isArray(this.formData)) console.log('formData must be array');
   }
 
-  saperateFormField() {
+  separateFormField() {
     this.formData.forEach((f) => (f.type === 'hidden' ? this.hiddenFields.push(f) : this.fields.push(f)));
   }
 
@@ -50,9 +50,9 @@ export default class Form {
 
       case 'textarea':
         ele = document.createElement('textarea');
-        ele.name = key;
-
+        ele.name = key; 
         this.applyAttributes(ele, field.attr);
+      
         break;
 
       case 'select':
@@ -71,15 +71,18 @@ export default class Form {
       case 'checkbox':
         ele = document.createElement('div');
         ele.classList.add('checkbox_place');
+        const checkboxes = [];
         field.options.forEach((opt) => {
           const input = document.createElement('input');
           input.type = 'checkbox';
           input.name = key;
           input.value = opt.value;
           this.applyAttributes(ele, field.attr);
+          checkboxes.push(input);
           ele.appendChild(input);
           ele.appendChild(document.createTextNode(opt.innerText));
         });
+
         break;
 
       case 'radio':
@@ -94,6 +97,7 @@ export default class Form {
           ele.appendChild(input);
           ele.appendChild(document.createTextNode(opt.innerText));
         });
+
         break;
 
       case 'submit':
@@ -121,7 +125,6 @@ export default class Form {
     this.fields.forEach((field) => {
       const value = data[field.key];
       if (value === undefined) return;
-
       const ele = this.container.querySelector(`[name="${field.key}"]`);
       if (!ele) return;
 

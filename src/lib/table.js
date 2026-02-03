@@ -6,6 +6,13 @@ export default class Table {
     this.onDelete = callbacks.onDelete || (()=>{});
   }
 
+  formatHeaderName(key) {
+    return key
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
   render(data) {
     const container = this.container;
     const tableSection = document.querySelector('.tableSection');
@@ -32,11 +39,14 @@ export default class Table {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
 
-    const headers = ['Name', 'Email', 'Phone', 'Address','Street-Address', 'City', 'State','Pincode', 'Country','Gender','Hobbies'];
+    
 
-    headers.forEach((header) => {
+    const firstRow = data[0];
+    const headers = Object.keys(firstRow).filter(key => key !== 'id' && key !== 'userId' && key !== 'createdAt');
+
+    headers.forEach((key) => {
       const th = document.createElement('th');
-      th.innerText = header;
+      th.innerText = this.formatHeaderName(key);
       headerRow.appendChild(th);
     });
 
@@ -50,9 +60,8 @@ export default class Table {
 
     const tbody = document.createElement('tbody');
 
-    data.forEach((emp,id) => {
+    data.forEach((emp) => {
       const row = document.createElement('tr');
-
       [
         emp.name,
         emp.email,
