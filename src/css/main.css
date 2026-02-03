@@ -106,7 +106,7 @@ label {
 
 
 .radioGender{
-  scale: 1.15;
+  scale:1.15;
   margin:0% 1.5%;
   accent-color: var(--primary);
   cursor: pointer;

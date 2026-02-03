@@ -4,7 +4,6 @@ export default class Form {
     this.formData = formData;
     this.hiddenFields = [];
     this.fields = [];
-
     this.editingId = null;
 
     this.onSubmit = callbacks.onSubmit || (() => { });
@@ -38,15 +37,6 @@ export default class Form {
     const key = field.key;
 
     switch (field.type) {
-      case 'text':
-      case 'email':
-      case 'number':
-      case 'tel':
-        ele = document.createElement('input');
-        ele.type = field.type;
-        ele.name = key;
-        this.applyAttributes(ele, field.attr);
-        break;
 
       case 'textarea':
         ele = document.createElement('textarea');
@@ -114,6 +104,13 @@ export default class Form {
         ele.textContent = field.attr.value;
         this.applyAttributes(ele,field.attr);
         break;
+
+        default :
+        ele = document.createElement('input');
+        ele.type = field.type;
+        ele.name = key;
+        this.applyAttributes(ele, field.attr);
+        break;
     }
 
     if (field.label) {
@@ -137,13 +134,6 @@ export default class Form {
       if (!ele) return;
 
       switch (field.type) {
-        case 'text':
-        case 'email':
-        case 'number':
-        case 'tel':
-        case 'textarea':
-          ele.value = value;
-          break;
 
         case 'select':
           ele.value = value;
@@ -168,6 +158,11 @@ export default class Form {
           });
           break;
         }
+
+        default:{          
+          ele.value = value;
+          break;
+        }
       }
     });
   }
@@ -176,17 +171,17 @@ export default class Form {
 
   applyAttributes(element, attr) {
     if (!attr) return;
+    if(!attr.className){
+       element.className = 'default_input';
+    }
 
     Object.keys(attr).forEach((key) => {
       const value = attr[key];
 
       if (typeof value === 'function' || key === 'name') return;
-      if (key === 'className') {
+      if (key === 'className' && value) {
         element.className = value;
-      }else{
-        element.classList.add('default_input');
-      }
-      if (key === 'required' && value === true) {
+      }else if (key === 'required' && value === true) {
         element.setAttribute('required', 'true');
       } else if(key==='required' && value === false){
         element.removeAttribute('required','');
@@ -197,7 +192,7 @@ export default class Form {
   }
 
   getFormDataObject() {
-    const formData = new FormData(this.container);
+    const formDataObject = new FormData(this.container);
     const data = {};
 
 
@@ -205,9 +200,9 @@ export default class Form {
       const key = field.key;
 
       if (field.type === 'checkbox') {
-        data[key] = formData.getAll(key);
+        data[key] = formDataObject.getAll(key);
       } else if (field.type !== 'submit' && field.type !== 'reset') {
-        data[key] = formData.get(key) || '';
+        data[key] = formDataObject.get(key) || '';
       }
     });
 

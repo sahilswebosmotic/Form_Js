@@ -32,7 +32,7 @@ const formData = [
       className: 'form-control textInput',
       placeholder: 'Enter name',
       name: 'txtName',
-      required: false,
+      required: true,
       onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
     },
   },
@@ -46,7 +46,7 @@ const formData = [
       className: 'form-control textInput',
       placeholder: 'Enter email',
       name: 'txtName',
-      required: false,
+      required: true,
       onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
     },
   },
@@ -56,7 +56,7 @@ const formData = [
     key: 'phone',
     value: '',
     attr:{
-      required:false,
+      required:true,
     }
   },
   {
