@@ -181,12 +181,12 @@ table button {
   cursor: pointer;
 }
 
-table button:first-child {
+.del_btn{
   background: var(--danger);
   color: white;
 }
 
-table button:last-child {
+.up_btn {
   background: var(--warning);
 }
 

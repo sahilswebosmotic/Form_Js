@@ -86,7 +86,7 @@ export default class Table {
 
       const del_btn = document.createElement('button');
       del_btn.textContent = 'DELETE';
-
+      del_btn.classList.add('del_btn')
       del_btn.addEventListener('click',(e)=>{
         const id = emp.id;
         this.onDelete(id);
@@ -94,6 +94,7 @@ export default class Table {
       
       const up_btn = document.createElement('button');
       up_btn.textContent = 'UPDATE';
+      up_btn.classList.add('up_btn');
       up_btn.addEventListener('click',(e)=>{
         window.scrollTo({
           top: 0,
