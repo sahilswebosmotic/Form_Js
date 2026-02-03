@@ -52,7 +52,6 @@ export default class Form {
         ele = document.createElement('textarea');
         ele.name = key; 
         this.applyAttributes(ele, field.attr);
-      
         break;
 
       case 'select':
@@ -70,32 +69,40 @@ export default class Form {
 
       case 'checkbox':
         ele = document.createElement('div');
-        ele.classList.add('checkbox_place');
         const checkboxes = [];
         field.options.forEach((opt) => {
           const input = document.createElement('input');
           input.type = 'checkbox';
           input.name = key;
           input.value = opt.value;
-          this.applyAttributes(ele, field.attr);
+          input.id = opt.attr.id;
+          input.className = opt.attr.className;
           checkboxes.push(input);
           ele.appendChild(input);
-          ele.appendChild(document.createTextNode(opt.innerText));
+          const label = document.createElement('label');
+          label.innerText = opt.innerText;
+          label.value = opt.value;
+          label.htmlFor = opt.attr.id;
+          ele.appendChild(label);
         });
 
         break;
 
       case 'radio':
         ele = document.createElement('div');
-        ele.classList.add('radio_place');
         field.options.forEach((opt) => {
           const input = document.createElement('input');
           input.type = 'radio';
           input.name = key;
           input.value = opt.value;
-          this.applyAttributes(ele, field.attr);
+          input.id = opt.attr.id;
+          input.className = opt.attr.className;
+          const label = document.createElement('label');
+          label.innerText = opt.innerText;
+          label.value = opt.value;
+          label.htmlFor = opt.attr.id;
           ele.appendChild(input);
-          ele.appendChild(document.createTextNode(opt.innerText));
+          ele.appendChild(label);
         });
 
         break;
@@ -105,6 +112,7 @@ export default class Form {
         ele = document.createElement('button');
         ele.type = field.type;
         ele.textContent = field.attr.value;
+        this.applyAttributes(ele,field.attr);
         break;
     }
 
@@ -173,12 +181,16 @@ export default class Form {
       const value = attr[key];
 
       if (typeof value === 'function' || key === 'name') return;
-
       if (key === 'className') {
         element.className = value;
-      } else if (key === 'required' && value === true) {
-        element.setAttribute('required', '');
-      } else {
+      }else{
+        element.classList.add('default_input');
+      }
+      if (key === 'required' && value === true) {
+        element.setAttribute('required', 'true');
+      } else if(key==='required' && value === false){
+        element.removeAttribute('required','');
+      }else {
         element.setAttribute(key, value);
       }
     });
@@ -224,8 +236,6 @@ export default class Form {
     });
   }
 
-
-  
 
   FormReset() {
     this.container.addEventListener('reset', () => {

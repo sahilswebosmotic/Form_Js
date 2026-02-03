@@ -32,17 +32,16 @@ class Main {
 
     this.table = new Table(tableContainerId, {
       onDelete: (id) => {
-        if (this.form.editingId === id) {
+        if (this.form.editingId != null) {
           this.form.container.reset();
           this.form.formState = {};
           this.form.editingId = null;
         }
-        this.storage.delete(id);
+        this.storage.delete(id);  
         this.form.showMessage('Record deleted successfully!', 'error');
       },
       onUpdate: (emp) => {
         this.form.updateFormData(emp);
-
       }
     });
 

@@ -32,7 +32,7 @@ const formData = [
       className: 'form-control textInput',
       placeholder: 'Enter name',
       name: 'txtName',
-      required: true,
+      required: false,
       onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
     },
   },
@@ -46,7 +46,7 @@ const formData = [
       className: 'form-control textInput',
       placeholder: 'Enter email',
       name: 'txtName',
-      required: true,
+      required: false,
       onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
     },
   },
@@ -55,7 +55,9 @@ const formData = [
     label: 'Phone',
     key: 'phone',
     value: '',
-    attr: {},
+    attr:{
+      required:false,
+    }
   },
   {
     type: 'textarea',
@@ -82,7 +84,7 @@ const formData = [
       className: 'form-control textInput',
       placeholder: 'Enter Street Address',
       name: 'txtName',
-      required: true,
+      required: false,
       onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
     },
   },
@@ -96,7 +98,7 @@ const formData = [
       className: 'form-control textInput',
       placeholder: 'Enter City',
       name: 'txtName',
-      required: true,
+      required: false,
       onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
     },
   },

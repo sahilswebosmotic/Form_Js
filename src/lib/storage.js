@@ -3,7 +3,6 @@ export default class Storage {
     this.storageId = storageId; 
     this.employees = this.loadFromStorage();
     this.onDataChange = callbacks.onDataChange || (() => { });
-
   }
 
   loadFromStorage() {
@@ -16,7 +15,7 @@ export default class Storage {
   }
 
   getAll() {
-    return this.employees;
+    return [...this.employees];
   }
 
   add(record) {
