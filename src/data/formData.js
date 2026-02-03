@@ -84,7 +84,7 @@ const formData = [
       className: 'form-control textInput',
       placeholder: 'Enter Street Address',
       name: 'txtName',
-      required: false,
+      required: true,
       onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
     },
   },
@@ -98,7 +98,7 @@ const formData = [
       className: 'form-control textInput',
       placeholder: 'Enter City',
       name: 'txtName',
-      required: false,
+      required: true,
       onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
     },
   },
@@ -107,7 +107,7 @@ const formData = [
     label: 'State',
     key: 'state',
     value: '',
-    attr: {
+    attr: { 
       id: 'txtState',
       className: 'form-control textInput',
       placeholder: 'Enter State',

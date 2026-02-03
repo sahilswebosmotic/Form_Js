@@ -14,7 +14,7 @@ export default class Form {
   initialize() {
     this.validateInputs();
     this.separateFormField();
-    this.loopingFields();
+    this.loopingAllInputFields();
     this.FormSubmit();
     this.FormReset();
   }
@@ -28,11 +28,11 @@ export default class Form {
     this.formData.forEach((f) => (f.type === 'hidden' ? this.hiddenFields.push(f) : this.fields.push(f)));
   }
 
-  loopingFields() {
-    this.fields.forEach((field) => this.loopField(field));
+  loopingAllInputFields() {
+    this.fields.forEach((field) => this.loopOnInputField(field));
   }
 
-  loopField(field) {
+  loopOnInputField(field) {
     let ele;
     const key = field.key;
 
@@ -70,6 +70,7 @@ export default class Form {
           checkboxes.push(input);
           ele.appendChild(input);
           const label = document.createElement('label');
+          label.classList.add('radio_check_label');
           label.innerText = opt.innerText;
           label.value = opt.value;
           label.htmlFor = opt.attr.id;
@@ -88,11 +89,12 @@ export default class Form {
           input.id = opt.attr.id;
           input.className = opt.attr.className;
           const label = document.createElement('label');
+          label.classList.add('radio_check_label');
           label.innerText = opt.innerText;
           label.value = opt.value;
           label.htmlFor = opt.attr.id;
           ele.appendChild(input);
-          ele.appendChild(label);
+          ele.appendChild(label); 
         });
 
         break;
@@ -168,7 +170,6 @@ export default class Form {
   }
 
 
-
   applyAttributes(element, attr) {
     if (!attr) return;
     if(!attr.className){
@@ -179,7 +180,7 @@ export default class Form {
       const value = attr[key];
 
       if (typeof value === 'function' || key === 'name') return;
-      if (key === 'className' && value) {
+      if (key === 'className') {
         element.className = value;
       }else if (key === 'required' && value === true) {
         element.setAttribute('required', 'true');
@@ -213,7 +214,6 @@ export default class Form {
       }
     });
 
-    console.log(data);
     return data;
   }
 
@@ -223,7 +223,7 @@ export default class Form {
       e.preventDefault();
       const data = this.getFormDataObject();
       if (this.editingId) {
-        data.id = this.editingId;
+        data.userId = this.editingId;
       } 
       this.onSubmit(data);
       this.container.reset();
@@ -240,7 +240,7 @@ export default class Form {
   }
 
   updateFormData(data) {
-    this.editingId = data.id;
+    this.editingId = data.userId;
     this.updateForm(data);
   }
 

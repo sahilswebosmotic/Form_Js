@@ -70,6 +70,7 @@ label {
   border: 0.1rem solid var(--border);
   border-radius: 0.3rem;
   font-size: 1rem;
+  max-width: 100%;
 }
 
 .textInput:focus{
@@ -119,6 +120,10 @@ label {
   cursor: pointer;
 }
 
+.radio_check_label{
+  font-weight: normal;
+}
+
 .btn{
   padding: 0.5rem 1.2rem;
   border-radius: 0.3rem;
@@ -139,7 +144,7 @@ label {
 
 
 .reset{
-    background: var(--secondary);
+  background: var(--secondary);
   color: white;
 }
 
@@ -241,6 +246,7 @@ table button {
     font-size: 1.6rem;
   }
 
+
   .container {
     padding: 1rem;
   }
@@ -253,5 +259,12 @@ table button {
   table button {
     font-size: 0.7rem;
     padding: 0.25rem 0.5rem;
+  }
+}
+
+@media (max-width : 25rem) {
+  .form-check-input{
+    display: flex;
+    flex-direction: column;
   }
 }

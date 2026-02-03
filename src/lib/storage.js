@@ -2,7 +2,7 @@ export default class Storage {
   constructor(storageId,callbacks={}) {
     this.storageId = storageId; 
     this.employees = this.loadFromStorage();
-    this.onDataChange = callbacks.onDataChange || (() => { });
+    this.onDataChange = callbacks.onDataChange || (() => { });  
   }
 
   loadFromStorage() {
@@ -14,29 +14,28 @@ export default class Storage {
     localStorage.setItem(this.storageId, JSON.stringify(this.employees));
   }
 
-  getAll() {
+  getAllEmployeeData() {
     return [...this.employees];
   }
 
-  add(record) {
-    record.id = Date.now();
-    this.employees.push(record);
+  addEmployeeData(employeeData) {
+    this.employees.push(employeeData);
     this.saveToStorage();
-    this.onDataChange(this.getAll());
+    this.onDataChange(this.getAllEmployeeData());
   }
 
-  delete(id) {
-    this.employees = this.employees.filter((emp) => emp.id !== id);
+  deleteEmployeeData(userId) {
+    this.employees = this.employees.filter((emp) => emp.userId !== userId);
     this.saveToStorage();
-    this.onDataChange(this.getAll());
+    this.onDataChange(this.getAllEmployeeData());
   }
 
-  update(record) {
-    const index = this.employees.findIndex((emp) => emp.id === record.id);
+  updateEmployeeData(employeeData) {
+    const index = this.employees.findIndex((emp) => emp.userId === employeeData.userId);
     if (index > -1) {
-      this.employees[index] = record;
+      this.employees[index] = employeeData;
       this.saveToStorage();
-      this.onDataChange(this.getAll());
+      this.onDataChange(this.getAllEmployeeData());
     }
   }
 }

@@ -33,14 +33,14 @@ export default class Table {
     if(tableSection) {
       tableSection.style.display = 'block';
     }
-    
     const table = document.createElement('table');
+    const up_div = document.createElement('div');
+    const count = document.createElement('h3');
+    count.innerText = `Total Items : ${data.length}`
+    up_div.appendChild(count);
 
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-
-    
-
     const firstRow = data[0];
     const headers = Object.keys(firstRow).filter(key => key !== 'id' && key !== 'userId' && key !== 'createdAt');
 
@@ -62,33 +62,22 @@ export default class Table {
 
     data.forEach((emp) => {
       const row = document.createElement('tr');
-      [
-        emp.name,
-        emp.email,
-        emp.phone,
-        emp.address,
-        emp.street_address,
-        emp.city,
-        emp.state,
-        emp.pin_code,
-        emp.country,
-        emp.gender,
-        Array.isArray(emp.hobbies) ? emp.hobbies.join(', ') : (emp.hobbies || ''),
-      ].forEach((value) => {
+      headers.forEach((header)=>{
         const td = document.createElement('td');
-        td.innerText = value;
-        if(!value){
+        td.innerText = emp[header];
+        if(!emp[header]){
           td.innerText = ' - ';
         }
         row.appendChild(td);
       });
+      
       const td = document.createElement('td');
-
+      
       const del_btn = document.createElement('button');
       del_btn.textContent = 'DELETE';
       del_btn.classList.add('del_btn')
       del_btn.addEventListener('click',(e)=>{
-        const id = emp.id;
+        const id = emp.userId;
         this.onDelete(id);
       })
       
@@ -109,6 +98,7 @@ export default class Table {
     });
 
     table.appendChild(tbody);
+    container.appendChild(up_div);
     container.appendChild(table);
   }
 }
